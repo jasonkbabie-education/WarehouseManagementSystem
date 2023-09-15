@@ -60,5 +60,16 @@ namespace WarehouseManagementSystem.Business
             var summaryWithTax = summary with { Total = summary.Total * 1.25m};
             return summaryWithTax;
         }
+
+        private decimal CalculateFrightCost(Order order)
+        => order.ShippingProvider switch
+            {
+                SwedishPostalServiceShippingProvider { DeliverNextDay: true }
+                provider => provider.FreightCost + 50m,
+
+                SwedishPostalServiceShippingProvider
+                provider => provider.FreightCost - 50m,
+                var provider => provider?.FreightCost ?? 50m
+            };
     }
 }

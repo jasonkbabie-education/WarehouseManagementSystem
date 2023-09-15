@@ -37,22 +37,28 @@ namespace WarehouseManagementSystem.Business
             // How do I produce a shipping label?
         }
 
-        public void Process(IEnumerable<Order> orders)
+        public (Guid orderNumber,
+            int amountOfItems,
+            decimal total,
+            IEnumerable<Item> items)
+            Process(IEnumerable<Order> orders)
         {
             var summaries = orders.Select(order =>
             {
-                return new
-                {
-                    Order = order.OrderNumber,
-                    Items = order.LineItems.Count(),
-                    Total = order.LineItems.Sum(item => item.Price)
-                };
+                return
+                (
+                    Order : order.OrderNumber,
+                    Items : order.LineItems.Count(),
+                    Total : order.LineItems.Sum(item => item.Price),
+                    order.LineItems
+                );
             });
 
             var orderedSummaries = summaries.OrderBy(summary => summary.Total);
 
             var summary = orderedSummaries.FirstOrDefault();
             var summaryWithTax = summary with { Total = summary.Total * 1.25m};
+            return summaryWithTax;
         }
     }
 }

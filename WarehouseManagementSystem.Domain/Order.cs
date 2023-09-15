@@ -12,6 +12,12 @@
         {
             OrderNumber = Guid.NewGuid();
         }
+
+        public void Deconstruct(out int total, out bool isRead)
+        {
+            total = Total;
+            isRead = IsReadyForShipment;
+        }
     }
 
     public class ProcessedOrder : Order { }

@@ -29,5 +29,6 @@ namespace WarehouseManagementSystem.Domain.Extensions
                 $"{Environment.NewLine}" +
                 $"Send to: {recipient}";
         }
+
     }
 }

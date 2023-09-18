@@ -6,7 +6,7 @@ namespace WarehouseManagementSystem.Business
     {
         public Func<Order, bool>? OnOrderInitialized { get; set; }
 
-        public event EventHandler<OrderCreatedEventArgs> OrderCreated;
+        public event EventHandler<OrderCreatedEventArgs>? OrderCreated;
 
         protected virtual void OnOrderCreated(OrderCreatedEventArgs args)
         {
@@ -20,21 +20,6 @@ namespace WarehouseManagementSystem.Business
             {
                 throw new Exception($"Couldn't initialize {order.OrderNumber}");
             }
-        }
-
-        public void Process(Order order, Action<Order> onCompleted = default)
-        {
-            // Run some code..
-
-            Initialize(order);
-            OnOrderCreated(new()
-            {
-                Order = order,
-                OldTotal = 100,
-                NewTotal = 80
-            });
-            onCompleted?.Invoke(order);
-            // How do I produce a shipping label?
         }
 
         public (Guid orderNumber,

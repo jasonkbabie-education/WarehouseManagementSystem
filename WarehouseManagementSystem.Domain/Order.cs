@@ -1,36 +1,71 @@
-﻿namespace WarehouseManagementSystem.Domain
-{
-    public class Order
-    {
-        public Guid OrderNumber { get; init; }
-        public ShippingProvider ShippingProvider { get; init; }
-        public int Total { get; }
-        public bool IsReadyForShipment { get; set; } = true;
-        public IEnumerable<Item> LineItems { get; set; }
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using System.Text.Json.Serialization;
 
-        public Order()
+namespace WarehouseManagementSystem.Domain
+{
+    public record Order (
+        [property: JsonPropertyName("total")]
+        decimal Total = 0,
+
+        [property: JsonIgnore]
+        IEnumerable<Item>? LineItems = default,
+
+        [AllowNull]
+        ShippingProvider ShippingProvider = default,
+
+        bool IsReadyForShipment = true)
+    {
+        public Guid OrderNumber { get; init; } = Guid.NewGuid();
+
+        [JsonIgnore]
+        public ShippingProvider ShippingProvider { get; init; } = ShippingProvider ?? new();
+
+        protected virtual bool PrintMembers(StringBuilder builder)
         {
-            OrderNumber = Guid.NewGuid();
+            builder.Append("A custom implementation");
+            return true;
         }
 
-        public void Deconstruct(out int total, out bool isRead)
+        public void Deconstruct(out decimal sum, out bool isRead)
         {
-            total = Total;
+            sum = Total;
             isRead = IsReadyForShipment;
         }
     }
 
-    public class PriorityOrder : Order { }
+    public record PriorityOrder(
+        decimal Total,
+        ShippingProvider ShippingProvider,
+        IEnumerable<Item> LineItems,
+        bool IsReadyForShipment = true
+        ) : Order(Total, LineItems, ShippingProvider, IsReadyForShipment) { }
 
-    public class ShippedOrder : Order {
+    public record ShippedOrder(
+                decimal Total,
+        ShippingProvider ShippingProvider,
+        IEnumerable<Item> LineItems,
+        bool IsReadyForShipment = true
+        ) : Order(Total, LineItems, ShippingProvider, IsReadyForShipment)
+    {
         public DateTime ShippedDate { get; set; }
     }
 
-    public class CancelledOrder : Order {
-        public DateTime CancelledOrder { get; set; }
+    public record CancelledOrder(decimal Total,
+        ShippingProvider ShippingProvider,
+        IEnumerable<Item> LineItems,
+        bool IsReadyForShipment = true
+        )  : Order(Total, LineItems, ShippingProvider, IsReadyForShipment)
+    {
+        public DateTime CancelledDate { get; set; }
     }
 
-    public class ProcessedOrder : Order { }
+    public record ProcessedOrder(decimal Total,
+        ShippingProvider ShippingProvider,
+        IEnumerable<Item> LineItems,
+        bool IsReadyForShipment = true
+        )  : Order(Total, LineItems, ShippingProvider, IsReadyForShipment)
+    { }
 
     public class Item
     {
